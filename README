@@ -1,0 +1,10 @@
+python code used to solve the kaggle connectenomix code challenge.
+
+challenge is to map a neuron network based on flourescence imaging.  essentially this is a time series correlation
+exercise with some twists.  most people approached it from a "transfer entropy" mathematical direction.  i tried
+that approach but also attacked it from a straight graph analysis.
+
+data pipeline is as follows:
+1) munge
+2) graph
+3) analyze
