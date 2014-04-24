@@ -28,14 +28,9 @@ from sklearn.metrics import roc_auc_score
 import sklearn.preprocessing as pre
 import pickle
 import os
-
-import pybrain as pb
-from pybrain.tools.shortcuts import buildNetwork
-from pybrain.datasets import SupervisedDataSet
-from pybrain.supervised.trainers import BackpropTrainer
 import time
 
-# prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
 # prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC02inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC02inh.txt','networkPositions_iNet1_Size100_CC02inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC03inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC03inh.txt','networkPositions_iNet1_Size100_CC03inh.txt']),
@@ -43,24 +38,24 @@ import time
 #              ('small',['fluorescence_iNet1_Size100_CC05inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC05inh.txt','networkPositions_iNet1_Size100_CC05inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC06inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC06inh.txt','networkPositions_iNet1_Size100_CC06inh.txt'])]
 # test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+train_nets = prep_nets
 
 # prep_nets = [
 #     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
 # ]
 
-prep_nets = [
-    ('valid', ['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
-    ('test', ['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
-]
-train_nets = [
-    ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
-]
-test_nets = [
-    ('valid',['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
-    ('test',['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
-]
+# prep_nets = [
+#     ('valid', ['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
+#     ('test', ['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
+# ]
+# train_nets = [
+#     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
+# ]
+# test_nets = [
+#     ('valid',['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
+#     ('test',['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
+# ]
 
-# train_nets = prep_nets
 
 model_file = '/Users/dan/dev/datasci/kaggle/connectomix/out/model2.pkl'
 
@@ -187,9 +182,9 @@ def evaluate(in_dir, nets):
         print('DIAG dft=' + str(dft.shape))
 
         _cols = [
-            ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
-            ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
-            ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15'],
+            # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
+            # ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
+            # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15'],
             ['d1','d2','d4','d8']
         ]
 
@@ -198,10 +193,6 @@ def evaluate(in_dir, nets):
 
             print('quick classifier...')
             # quick classifier
-            # cols = ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15']
-            # cols = ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15']
-            # cols = ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15']
-            # cols = ['d1','d2','d4','d8']
             X = dft[cols]
             y = dft['act']
 
@@ -210,7 +201,7 @@ def evaluate(in_dir, nets):
             # X = pd.DataFrame(scaled, columns=X.columns)
 
             # xval
-            clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:2})
+            clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
             # clf = RandomForestClassifier(n_estimators=10, max_features=.5)
             scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
             mscores = np.mean(scores)
@@ -240,16 +231,16 @@ def evaluate(in_dir, nets):
 
 
             # logistic regression
-            for C in [.01,.1,1,10]:
-                for p in ['l1','l2']:
-                    for w in [1,2,4,8]:
-                        print (k + ': evaluating C=' + str(C) + ' p=' + p + ' w=' + str(w))
-                        clf = LogisticRegression(C=C,penalty=p, class_weight={0:1,1:w})
-                        scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
-                        mscores = np.mean(scores)
-                        print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
-                        if mscores > best_auc:
-                            best_auc = mscores
+            # for C in [.01,.1,1,10]:
+            #     for p in ['l1','l2']:
+            #         for w in [1,2,4,8]:
+            #             print (k + ': evaluating C=' + str(C) + ' p=' + p + ' w=' + str(w))
+            #             clf = LogisticRegression(C=C,penalty=p, class_weight={0:1,1:w})
+            #             scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+            #             mscores = np.mean(scores)
+            #             print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
+            #             if mscores > best_auc:
+            #                 best_auc = mscores
 
 
             # random forest
@@ -263,24 +254,6 @@ def evaluate(in_dir, nets):
             #             print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
             #             if mscores > best_auc:
             #                 best_auc = mscores
-
-            # neural net
-            # X_train,X_test,y_train,y_test = train_test_split(X, y)
-            # net = buildNetwork(X_train.shape[1], X_train.shape[1] * 3, 1)
-            # ds = SupervisedDataSet(X_train.shape[1], 1)
-            # ds.setField('input', X_train)
-            # ds.setField('target', y_train.reshape(-1, 1))
-            # trainer = BackpropTrainer(net, ds)
-            # trainer.trainUntilConvergence( verbose = True, validationProportion = 0.15, maxEpochs = 20, continueEpochs = 10 )
-            #
-            # ds = SupervisedDataSet(X_test.shape[1], 1)
-            # ds.setField('input', X_test)
-            # ds.setField('target', y_test.reshape(-1,1))
-            # z = net.activateOnDataset(ds)
-            # print (k + ' NN results:\n' + str(list(z)))
-            # fpr, tpr, t = sl.metrics.roc_curve(y_test, z )
-            # print (k + ': roc auc: ' + str(sl.metrics.auc(fpr, tpr)))
-
 
         print ('done; best_auc=' + str(best_auc))
 
@@ -409,17 +382,20 @@ def predict(in_dir, model_file, nets, scaler=None):
 
 # prepare(in_dir, prep_nets)
 
-# evaluate(in_dir, train_nets)
+evaluate(in_dir, train_nets)
 
-scaler = train(in_dir, train_nets)
+# scaler = train(in_dir, train_nets)
 
-predict(in_dir, model_file, test_nets, scaler)
+# predict(in_dir, model_file, test_nets, scaler)
 
 
 # still to try:
 # - neural net
-# - KNN - default config got .732
-# - adjusting features
+# -- increase hidden layers
+# -- increase epochs
+# x KNN - default config got .732
+# x adjusting features
 # - different graph model treatment of burst periods
 # - ensemble between correlation and graph approach
-# - create 8x8 pre-active probability matrix on each connection
+# x create 8x8 pre-active probability matrix on each connection
+# - remove directionality

@@ -36,14 +36,15 @@ from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
 
 
-prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+# prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
 # prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC02inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC02inh.txt','networkPositions_iNet1_Size100_CC02inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC03inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC03inh.txt','networkPositions_iNet1_Size100_CC03inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC04inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC04inh.txt','networkPositions_iNet1_Size100_CC04inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC05inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC05inh.txt','networkPositions_iNet1_Size100_CC05inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC06inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC06inh.txt','networkPositions_iNet1_Size100_CC06inh.txt'])]
-test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+# test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+# train_nets = prep_nets
 
 # prep_nets = [
 #     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
@@ -52,15 +53,13 @@ test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.gr
 #     ('valid', ['fluorescence_valid.txt.desc.csv-graph.graphml','','networkPositions_valid.txt']),
 #     ('test', ['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
 # ]
-# train_nets = [
-#     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
-# ]
+train_nets = [
+    ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
+]
 # test_nets = [
 #     ('valid',['fluorescence_valid.txt.desc.csv-graph.graphml','','networkPositions_valid.txt']),
 #     ('test',['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
 # ]
-
-train_nets = prep_nets
 
 model_file = '/Users/dan/dev/datasci/kaggle/connectomix/out/model.pkl'
 
@@ -200,12 +199,10 @@ def evaluate(in_dir, nets):
         # dft = dfj
         print('DIAG dft=' + str(dft.shape))
 
-
-
         # quick classifier
         # X = dft[['d1-0']]
-        # X = dft[['d1-0','d1-1','d1-2','d1-3','dist']]
-        X = dft[['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']]
+        X = dft[['d1-0','d1-1','d1-2','d1-3','dist']]
+        # X = dft[['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']]
         # X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
         # X = dft[['d1-0','d1-1','d1-2','d1-3']]
         y = dft['act']
@@ -407,11 +404,11 @@ def predict(in_dir, model_file, nets, scaler=None):
 
 # prepare(in_dir, prep_nets)
 
-# evaluate(in_dir, train_nets)
+evaluate(in_dir, train_nets)
 
-scaler = train(in_dir, model_file, train_nets)
+# scaler = train(in_dir, model_file, train_nets)
 
-predict(in_dir, model_file, test_nets, scaler)
+# predict(in_dir, model_file, test_nets, scaler)
 
 
 # still to try:
