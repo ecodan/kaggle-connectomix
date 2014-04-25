@@ -34,6 +34,7 @@ import pybrain as pb
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.structure import TanhLayer
 
 
 # prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
@@ -56,10 +57,10 @@ from pybrain.supervised.trainers import BackpropTrainer
 train_nets = [
     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
 ]
-# test_nets = [
-#     ('valid',['fluorescence_valid.txt.desc.csv-graph.graphml','','networkPositions_valid.txt']),
-#     ('test',['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
-# ]
+test_nets = [
+    ('valid',['fluorescence_valid.txt.desc.csv-graph.graphml','','networkPositions_valid.txt']),
+    ('test',['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
+]
 
 model_file = '/Users/dan/dev/datasci/kaggle/connectomix/out/model.pkl'
 
@@ -201,9 +202,9 @@ def evaluate(in_dir, nets):
 
         # quick classifier
         # X = dft[['d1-0']]
-        X = dft[['d1-0','d1-1','d1-2','d1-3','dist']]
+        # X = dft[['d1-0','d1-1','d1-2','d1-3','dist']]
         # X = dft[['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']]
-        # X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
+        X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
         # X = dft[['d1-0','d1-1','d1-2','d1-3']]
         y = dft['act']
 
@@ -263,21 +264,21 @@ def evaluate(in_dir, nets):
         #                 best_auc = mscores
 
         # neural net
-        # X_train,X_test,y_train,y_test = train_test_split(X, y)
-        # net = buildNetwork(X_train.shape[1], X_train.shape[1] * 3, 1)
-        # ds = SupervisedDataSet(X_train.shape[1], 1)
-        # ds.setField('input', X_train)
-        # ds.setField('target', y_train.reshape(-1, 1))
-        # trainer = BackpropTrainer(net, ds)
-        # trainer.trainUntilConvergence( verbose = True, validationProportion = 0.15, maxEpochs = 20, continueEpochs = 10 )
-        #
-        # ds = SupervisedDataSet(X_test.shape[1], 1)
-        # ds.setField('input', X_test)
-        # ds.setField('target', y_test.reshape(-1,1))
-        # z = net.activateOnDataset(ds)
-        # print (k + ' NN results:\n' + str(list(z)))
-        # fpr, tpr, t = sl.metrics.roc_curve(y_test, z )
-        # print (k + ': roc auc: ' + str(sl.metrics.auc(fpr, tpr)))
+        X_train,X_test,y_train,y_test = train_test_split(X, y)
+        net = buildNetwork(X_train.shape[1], X_train.shape[1] * 2, 1, bias=True, hiddenclass=TanhLayer)
+        ds = SupervisedDataSet(X_train.shape[1], 1)
+        ds.setField('input', X_train)
+        ds.setField('target', y_train.reshape(-1, 1))
+        trainer = BackpropTrainer(net, ds)
+        trainer.trainUntilConvergence( verbose = True, validationProportion = 0.25, maxEpochs = 50, continueEpochs = 10 )
+
+        ds = SupervisedDataSet(X_test.shape[1], 1)
+        ds.setField('input', X_test)
+        ds.setField('target', y_test.reshape(-1,1))
+        z = net.activateOnDataset(ds)
+        print (k + ' NN results:\n' + str(list(z)))
+        fpr, tpr, t = sl.metrics.roc_curve(y_test, z )
+        print (k + ': roc auc: ' + str(sl.metrics.auc(fpr, tpr)))
 
 
         print ('done; best_auc=' + str(best_auc))
@@ -407,7 +408,7 @@ def predict(in_dir, model_file, nets, scaler=None):
 evaluate(in_dir, train_nets)
 
 # scaler = train(in_dir, model_file, train_nets)
-
+#
 # predict(in_dir, model_file, test_nets, scaler)
 
 
