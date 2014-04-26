@@ -29,8 +29,9 @@ import sklearn.preprocessing as pre
 import pickle
 import os
 import time
+from sklearn.ensemble import GradientBoostingClassifier
 
-prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+# prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
 # prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC02inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC02inh.txt','networkPositions_iNet1_Size100_CC02inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC03inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC03inh.txt','networkPositions_iNet1_Size100_CC03inh.txt']),
@@ -38,24 +39,52 @@ prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.g
 #              ('small',['fluorescence_iNet1_Size100_CC05inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC05inh.txt','networkPositions_iNet1_Size100_CC05inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC06inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC06inh.txt','networkPositions_iNet1_Size100_CC06inh.txt'])]
 # test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
-train_nets = prep_nets
+# train_nets = prep_nets
 
 # prep_nets = [
-#     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
+    #     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
+    # ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
+    # ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph2.graphml','network_normal-3.txt','networkPositions_normal-3.txt']),
+    # ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph2.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt']),
+    # ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
+    # ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph2.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt']),
+    # ('highcc',['fluorescence_highcc.txt.desc.csv-graph2.graphml','network_highcc.txt','networkPositions_highcc.txt']),
+    # ('highcon',['fluorescence_highcon.txt.desc.csv-graph2.graphml','network_highcon.txt','networkPositions_highcon.txt']),
+    # ('lowcc',['fluorescence_lowcc.txt.desc.csv-graph2.graphml','network_lowcc.txt','networkPositions_lowcc.txt']),
+    # ('lowcon',['fluorescence_lowcon.txt.desc.csv-graph2.graphml','network_lowcon.txt','networkPositions_lowcon.txt']),
+    #     ('valid', ['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
+    #     ('test', ['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
 # ]
 
 # prep_nets = [
 #     ('valid', ['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
 #     ('test', ['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
 # ]
-# train_nets = [
-#     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
-# ]
-# test_nets = [
-#     ('valid',['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
-#     ('test',['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
-# ]
 
+train_nets = [
+    ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
+    # ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
+#     ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph2.graphml','network_normal-3.txt','networkPositions_normal-3.txt']),
+#     ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph2.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt']),
+#     ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
+#     ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph2.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt']),
+#     ('highcc',['fluorescence_highcc.txt.desc.csv-graph2.graphml','network_highcc.txt','networkPositions_highcc.txt']),
+#     ('highcon',['fluorescence_highcon.txt.desc.csv-graph2.graphml','network_highcon.txt','networkPositions_highcon.txt']),
+#     ('lowcc',['fluorescence_lowcc.txt.desc.csv-graph2.graphml','network_lowcc.txt','networkPositions_lowcc.txt']),
+#     ('lowcon',['fluorescence_lowcon.txt.desc.csv-graph2.graphml','network_lowcon.txt','networkPositions_lowcon.txt']),
+]
+
+test_nets = [
+    ('valid',['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
+    ('test',['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
+]
+
+_cols = [
+    ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
+    # ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
+    # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15'],
+    # ['d1','d2','d4','d8']
+]
 
 model_file = '/Users/dan/dev/datasci/kaggle/connectomix/out/model2.pkl'
 
@@ -156,6 +185,9 @@ def evaluate(in_dir, nets):
 
     best_auc = 0.0
 
+    X_ref = []
+    y_ref = []
+
     for t in nets:
         k = t[0]
         v = t[1]
@@ -181,13 +213,6 @@ def evaluate(in_dir, nets):
         # dft = dfj
         print('DIAG dft=' + str(dft.shape))
 
-        _cols = [
-            # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
-            # ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
-            # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15'],
-            ['d1','d2','d4','d8']
-        ]
-
         for cols in _cols:
             print('starting for cols=' + str(cols))
 
@@ -195,6 +220,10 @@ def evaluate(in_dir, nets):
             # quick classifier
             X = dft[cols]
             y = dft['act']
+
+            if k == 'normal-1':
+                X_ref = X
+                y_ref = y
 
             scaler = pre.StandardScaler()
             # scaled = scaler.fit_transform(X)
@@ -208,6 +237,20 @@ def evaluate(in_dir, nets):
             print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
             if mscores > best_auc:
                 best_auc = mscores
+
+            # test on ref
+            # clf.fit(X, y)
+            # z = clf.predict_proba(X_ref)
+            # # this is probably a crappy way to do this
+            # probs = []
+            # for r in z:
+            #     probs.append(r[1])
+            # fpr, tpr, t = sl.metrics.roc_curve(y_ref, probs )
+            # auc = sl.metrics.auc(fpr, tpr)
+            # print (k + ' roc auc ref: ' + str(auc))
+            # if auc > best_auc:
+            #     best_auc = auc
+
 
             # print('learning curve: ' + str(learning_curve(clf, X, y, range(500,30500,10000))))
 
@@ -255,14 +298,24 @@ def evaluate(in_dir, nets):
             #             if mscores > best_auc:
             #                 best_auc = mscores
 
+            # gradient boost
+            for e in [50,100,200]:
+                    for f in [.5,.75,1.0]:
+                        print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+                        clf = GradientBoostingClassifier(n_estimators=e, max_features=f, verbose=True)
+                        scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+                        mscores = np.mean(scores)
+                        print(k + ': GB xval scores=' + str(scores) + ' | mean=' + str(mscores))
+                        if mscores > best_auc:
+                            best_auc = mscores
+
+
         print ('done; best_auc=' + str(best_auc))
 
 def train(in_dir, nets):
     print('train...')
 
-    if len(nets) > 1:
-        print('ERROR can only support one training net since only one model file supported')
-        return
+    dft = []
 
     for t in nets:
         k = t[0]
@@ -285,56 +338,58 @@ def train(in_dir, nets):
         dfj = dfc.join(actuals)
         dfj['act'] = dfj['act'].apply(lambda x: 1 if x == 1 else 0)
 
-        scaler = pre.StandardScaler()
+        if len(dft) == 0:
+            dft = dfj
+        else:
+            dft = dft.append(dfj)
 
-        # quick classifier
-        dft = dfj[dfj['i'] != dfj['j']]
+    # now train
+    scaler = pre.StandardScaler()
 
-        cols = ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15']
-        # cols = ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15']
-        # cols = ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15']
-        # cols = ['d1','d2','d4','d8']
-        X = dft[cols]
-        y = dft['act']
+    dft = dft[dft['i'] != dft['j']]
 
-        # shouldn't be needed since ranges are modest
-        # scaled = scaler.fit_transform(X)
-        # X = pd.DataFrame(scaled, columns=X.columns)
+    cols = _cols[0]
+    X = dft[cols]
+    y = dft['act']
 
-        X_train,X_test,y_train,y_test = train_test_split(X, y)
-        print(k + ' y_train ' + str(len(y_train)) + '|' + str(np.sum(y_train)))
-        print(k + ' y_test ' + str(len(y_test)) + '|' + str(np.sum(y_test)))
+    # shouldn't be needed since ranges are modest
+    # scaled = scaler.fit_transform(X)
+    # X = pd.DataFrame(scaled, columns=X.columns)
 
-        print(k + ': fitting model')
-        # per xval on all features: C=1, p=l1, w=8
-        clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
-        # clf = SVC(C=1, kernel='poly')
-        clf.fit(X,y)
-        s = pickle.dumps(clf)
-        f = open(model_file, 'w')
-        f.write(s)
-        f.close()
+    X_train,X_test,y_train,y_test = train_test_split(X, y)
+    print(k + ' y_train ' + str(len(y_train)) + '|' + str(np.sum(y_train)))
+    print(k + ' y_test ' + str(len(y_test)) + '|' + str(np.sum(y_test)))
 
-        f = open(model_file, 'r')
-        s2 = f.read()
-        clf2 = pickle.loads(s2)
-        z = clf2.predict(X_test)
-        # print (k + ' roc auc: ' + str(roc_auc_score(y_test,z)))
-        print (k + ' conf matrix:\n' + str(sl.metrics.confusion_matrix(y_test,z)))
-        # print (k + ' class report:\n' + str(sl.metrics.classification_report(y_test,z)))
-        z = clf2.predict_proba(X_test)
+    print(k + ': fitting model')
+    # per xval on all features: C=1, p=l1, w=8
+    # clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
+    clf = GradientBoostingClassifier(n_estimators=100, max_features=.75, verbose=True)
+    clf.fit(X,y)
+    s = pickle.dumps(clf)
+    f = open(model_file, 'w')
+    f.write(s)
+    f.close()
 
-        # this is probably a crappy way to do this
-        probs = []
-        for r in z:
-            probs.append(r[1])
-        fpr, tpr, t = sl.metrics.roc_curve(y_test, probs )
-        print (k + ' roc auc 2: ' + str(sl.metrics.auc(fpr, tpr)))
-        # score to beat: 0.913357595165
+    f = open(model_file, 'r')
+    s2 = f.read()
+    clf2 = pickle.loads(s2)
+    z = clf2.predict(X_test)
+    # print (k + ' roc auc: ' + str(roc_auc_score(y_test,z)))
+    print (k + ' conf matrix:\n' + str(sl.metrics.confusion_matrix(y_test,z)))
+    # print (k + ' class report:\n' + str(sl.metrics.classification_report(y_test,z)))
+    z = clf2.predict_proba(X_test)
 
-        scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
-        print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
-        return scaler
+    # this is probably a crappy way to do this
+    probs = []
+    for r in z:
+        probs.append(r[1])
+    fpr, tpr, t = sl.metrics.roc_curve(y_test, probs )
+    print (k + ' roc auc 2: ' + str(sl.metrics.auc(fpr, tpr)))
+    # score to beat: 0.913357595165
+
+    scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
+    print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
+    return scaler
 
 def predict(in_dir, model_file, nets, scaler=None):
     print('predict...')
@@ -350,10 +405,7 @@ def predict(in_dir, model_file, nets, scaler=None):
         # read tables
         dft = pd.read_table(out_dir + '/' + v[0] + '.test.csv', sep=',', index_col=[0,1])
 
-        cols = ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15']
-        # cols = ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15']
-        # cols = ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15']
-        # cols = ['d1','d2','d4','d8']
+        cols = _cols[0]
         X = dft[cols]
 
         # scaled = scaler.transform(X)
@@ -382,11 +434,11 @@ def predict(in_dir, model_file, nets, scaler=None):
 
 # prepare(in_dir, prep_nets)
 
-evaluate(in_dir, train_nets)
+# evaluate(in_dir, train_nets)
 
-# scaler = train(in_dir, train_nets)
+scaler = train(in_dir, train_nets)
 
-# predict(in_dir, model_file, test_nets, scaler)
+predict(in_dir, model_file, test_nets, scaler)
 
 
 # still to try:

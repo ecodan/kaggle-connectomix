@@ -29,21 +29,18 @@ import time
 nets = [('valid','fluorescence_valid.txt.desc.csv'),
         ('test','fluorescence_test.txt.desc.csv')]
 
-# nets = [
+nets = [
 #     ('normal-1','fluorescence_normal-1.txt.desc.csv'),
-#     ]
-
-# nets = [
-#     ('normal-2','fluorescence_normal-2.txt.desc.csv'),
-#     ('normal-3-highrate','fluorescence_normal-3-highrate.txt.desc.csv'),
-#     ('normal-3','fluorescence_normal-3.txt.desc.csv'),
-#     ('normal-4','fluorescence_normal-4.txt.desc.csv'),
-#     ('normal-4-lownoise','fluorescence_normal-4-lownoise.txt.desc.csv'),
-#     ('highcc','fluorescence_highcc.txt.desc.csv'),
-#     ('lowcc','fluorescence_lowcc.txt.desc.csv'),
-#     ('highcon','fluorescence_highcon.txt.desc.csv'),
-#     ('lowcon','fluorescence_lowcon.txt.desc.csv')
-# ]
+    ('normal-2','fluorescence_normal-2.txt.desc.csv'),
+    ('normal-3-highrate','fluorescence_normal-3-highrate.txt.desc.csv'),
+    ('normal-3','fluorescence_normal-3.txt.desc.csv'),
+    ('normal-4','fluorescence_normal-4.txt.desc.csv'),
+    ('normal-4-lownoise','fluorescence_normal-4-lownoise.txt.desc.csv'),
+    ('highcc','fluorescence_highcc.txt.desc.csv'),
+    ('lowcc','fluorescence_lowcc.txt.desc.csv'),
+    ('highcon','fluorescence_highcon.txt.desc.csv'),
+    ('lowcon','fluorescence_lowcon.txt.desc.csv')
+    ]
 
 in_dir = '/Users/dan/dev/datasci/kaggle/connectomix/'
 

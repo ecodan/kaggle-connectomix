@@ -46,14 +46,21 @@ from pybrain.structure import SigmoidLayer
 # test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
 # train_nets = prep_nets
 
-# prep_nets = [
+prep_nets = [
 #     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
-# ]
-
-# prep_nets = [
+    ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt'])
+    ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph2.graphml','network_normal-3.txt','networkPositions_normal-3.txt'])
+    ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph2.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt'])
+    ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt'])
+    ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph2.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt'])
+    ('highcc',['fluorescence_highcc.txt.desc.csv-graph2.graphml','network_highcc.txt','networkPositions_highcc.txt'])
+    ('highcon',['fluorescence_highcon.txt.desc.csv-graph2.graphml','network_highcon.txt','networkPositions_highcon.txt'])
+    ('lowcc',['fluorescence_lowcc.txt.desc.csv-graph2.graphml','network_lowcc.txt','networkPositions_lowcc.txt'])
+    ('lowcon',['fluorescence_lowcon.txt.desc.csv-graph2.graphml','network_lowcon.txt','networkPositions_lowcon.txt'])
 #     ('valid', ['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
 #     ('test', ['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
-# ]
+]
+
 train_nets = [
     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
 ]
@@ -277,9 +284,9 @@ def predict(in_dir, model_file, nets):
     df.to_csv(in_dir + '/out/predictions.csv', index=False)
     print('done; num rows=' + str(len(df)))
 
-# prepare(in_dir, prep_nets)
+prepare(in_dir, prep_nets)
 
-evaluate(in_dir, train_nets)
+# evaluate(in_dir, train_nets)
 
 # scaler = train(in_dir, train_nets)
 

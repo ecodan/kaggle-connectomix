@@ -27,24 +27,21 @@ import time
 #         ('small','fluorescence_iNet1_Size100_CC05inh.txt.desc.csv'),
 #         ('small','fluorescence_iNet1_Size100_CC06inh.txt.desc.csv')]
 
-nets = [('valid','fluorescence_valid.txt.desc.csv'),
-        ('test','fluorescence_test.txt.desc.csv')]
+# nets = [('valid','fluorescence_valid.txt.desc.csv'),
+#         ('test','fluorescence_test.txt.desc.csv')]
 
-# nets = [
+nets = [
 #     ('normal-1','fluorescence_normal-1.txt.desc.csv'),
-#     ]
-
-# nets = [
-#     ('normal-2','fluorescence_normal-2.txt.desc.csv'),
-#     ('normal-3-highrate','fluorescence_normal-3-highrate.txt.desc.csv'),
-#     ('normal-3','fluorescence_normal-3.txt.desc.csv'),
-#     ('normal-4','fluorescence_normal-4.txt.desc.csv'),
-#     ('normal-4-lownoise','fluorescence_normal-4-lownoise.txt.desc.csv'),
-#     ('highcc','fluorescence_highcc.txt.desc.csv'),
-#     ('lowcc','fluorescence_lowcc.txt.desc.csv'),
-#     ('highcon','fluorescence_highcon.txt.desc.csv'),
-#     ('lowcon','fluorescence_lowcon.txt.desc.csv')
-# ]
+    ('normal-2','fluorescence_normal-2.txt.desc.csv'),
+    ('normal-3-highrate','fluorescence_normal-3-highrate.txt.desc.csv'),
+    ('normal-3','fluorescence_normal-3.txt.desc.csv'),
+    ('normal-4','fluorescence_normal-4.txt.desc.csv'),
+    ('normal-4-lownoise','fluorescence_normal-4-lownoise.txt.desc.csv'),
+    ('highcc','fluorescence_highcc.txt.desc.csv'),
+    ('lowcc','fluorescence_lowcc.txt.desc.csv'),
+    ('highcon','fluorescence_highcon.txt.desc.csv'),
+    ('lowcon','fluorescence_lowcon.txt.desc.csv')
+    ]
 
 in_dir = '/Users/dan/dev/datasci/kaggle/connectomix/'
 
@@ -122,7 +119,7 @@ def nw_graph(in_dir, nets, lookforward_pers=3):
                         if 'e1' not in edge:
                             for e in range(0,16):
                                 edge['e'+str(e)] = 0
-                        _ent = array_to_int(window[::,j])
+                        _ent = array_to_int(window[::,j]) # convert the vertical array to an int
                         edge['e' + str(_ent)] += 1
 
 
