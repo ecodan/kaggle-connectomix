@@ -63,10 +63,10 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 train_nets = [
     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
-    # ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
+    ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
 #     ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph2.graphml','network_normal-3.txt','networkPositions_normal-3.txt']),
 #     ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph2.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt']),
-#     ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
+    ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
 #     ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph2.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt']),
 #     ('highcc',['fluorescence_highcc.txt.desc.csv-graph2.graphml','network_highcc.txt','networkPositions_highcc.txt']),
 #     ('highcon',['fluorescence_highcon.txt.desc.csv-graph2.graphml','network_highcon.txt','networkPositions_highcon.txt']),
@@ -363,7 +363,7 @@ def train(in_dir, nets):
     print(k + ': fitting model')
     # per xval on all features: C=1, p=l1, w=8
     # clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
-    clf = GradientBoostingClassifier(n_estimators=100, max_features=.75, verbose=True)
+    clf = GradientBoostingClassifier(n_estimators=200, max_features=.75, verbose=True)
     clf.fit(X,y)
     s = pickle.dumps(clf)
     f = open(model_file, 'w')
@@ -387,8 +387,8 @@ def train(in_dir, nets):
     print (k + ' roc auc 2: ' + str(sl.metrics.auc(fpr, tpr)))
     # score to beat: 0.913357595165
 
-    scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
-    print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
+    # scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
+    # print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
     return scaler
 
 def predict(in_dir, model_file, nets, scaler=None):
@@ -429,7 +429,7 @@ def predict(in_dir, model_file, nets, scaler=None):
 
     print('writing final output')
     df = pd.DataFrame(res,columns=['NET_neuronI_neuronJ','Strength'])
-    df.to_csv(in_dir + '/out/predictions.csv', index=False)
+    df.to_csv(in_dir + '/out/predictions2.csv', index=False)
     print('done; num rows=' + str(len(df)))
 
 # prepare(in_dir, prep_nets)

@@ -284,7 +284,7 @@ def predict(in_dir, model_file, nets):
     df.to_csv(in_dir + '/out/predictions.csv', index=False)
     print('done; num rows=' + str(len(df)))
 
-prepare(in_dir, prep_nets)
+# prepare(in_dir, prep_nets)
 
 # evaluate(in_dir, train_nets)
 

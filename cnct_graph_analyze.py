@@ -29,6 +29,9 @@ import sklearn.preprocessing as pre
 import pickle
 import os
 from datetime import datetime
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 
 import pybrain as pb
 from pybrain.tools.shortcuts import buildNetwork
@@ -61,6 +64,12 @@ test_nets = [
     ('valid',['fluorescence_valid.txt.desc.csv-graph.graphml','','networkPositions_valid.txt']),
     ('test',['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
 ]
+
+# _cols = ['d1-0','d1-1','d2-0','d3-0']
+# _cols = ['d1-0','d1-1','d1-2','d1-3']
+_cols = ['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']
+# _cols = ['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']
+# _cols = ['1-0','1-1','d1-0','d1-1','1-B','2-0','d2-0','2-B','3-0','d3-0','3-B','dist']
 
 model_file = '/Users/dan/dev/datasci/kaggle/connectomix/out/model.pkl'
 
@@ -264,22 +273,52 @@ def evaluate(in_dir, nets):
         #                 best_auc = mscores
 
         # neural net
-        X_train,X_test,y_train,y_test = train_test_split(X, y)
-        net = buildNetwork(X_train.shape[1], X_train.shape[1] * 2, 1, bias=True, hiddenclass=TanhLayer)
-        ds = SupervisedDataSet(X_train.shape[1], 1)
-        ds.setField('input', X_train)
-        ds.setField('target', y_train.reshape(-1, 1))
-        trainer = BackpropTrainer(net, ds)
-        trainer.trainUntilConvergence( verbose = True, validationProportion = 0.25, maxEpochs = 50, continueEpochs = 10 )
+        # X_train,X_test,y_train,y_test = train_test_split(X, y)
+        # net = buildNetwork(X_train.shape[1], X_train.shape[1] * 2, 1, bias=True, hiddenclass=TanhLayer)
+        # ds = SupervisedDataSet(X_train.shape[1], 1)
+        # ds.setField('input', X_train)
+        # ds.setField('target', y_train.reshape(-1, 1))
+        # trainer = BackpropTrainer(net, ds)
+        # trainer.trainUntilConvergence( verbose = True, validationProportion = 0.25, maxEpochs = 50, continueEpochs = 10 )
+        #
+        # ds = SupervisedDataSet(X_test.shape[1], 1)
+        # ds.setField('input', X_test)
+        # ds.setField('target', y_test.reshape(-1,1))
+        # z = net.activateOnDataset(ds)
+        # print (k + ' NN results:\n' + str(list(z)))
+        # fpr, tpr, t = sl.metrics.roc_curve(y_test, z )
+        # print (k + ': roc auc: ' + str(sl.metrics.auc(fpr, tpr)))
 
-        ds = SupervisedDataSet(X_test.shape[1], 1)
-        ds.setField('input', X_test)
-        ds.setField('target', y_test.reshape(-1,1))
-        z = net.activateOnDataset(ds)
-        print (k + ' NN results:\n' + str(list(z)))
-        fpr, tpr, t = sl.metrics.roc_curve(y_test, z )
-        print (k + ': roc auc: ' + str(sl.metrics.auc(fpr, tpr)))
+        # for e in [50,100,200]:
+        #     for f in [.5,.75,1.0]:
+        #         print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+        #         clf = GradientBoostingClassifier(n_estimators=e, max_features=f, verbose=True)
+        #         scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+        #         mscores = np.mean(scores)
+        #         print(k + ': GB xval scores=' + str(scores) + ' | mean=' + str(mscores))
+        #         if mscores > best_auc:
+        #             best_auc = mscores
 
+        # for e in [50,100,200]:
+        #     for f in [.5,.75,1.0]:
+        #         print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+        #         clf = AdaBoostClassifier(n_estimators=e, learning_rate=f)
+        #         scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+        #         mscores = np.mean(scores)
+        #         print(k + ': AB xval scores=' + str(scores) + ' | mean=' + str(mscores))
+        #         if mscores > best_auc:
+        #             best_auc = mscores
+
+        # best score small .706 vs .722 LR
+        # for e in [50,100,200]:
+        #     for f in [.5,.75,1.0]:
+        #         print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+        #         clf = ExtraTreesClassifier(n_estimators=e, max_features=f, n_jobs=2, verbose=True)
+        #         scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+        #         mscores = np.mean(scores)
+        #         print(k + ': ET xval scores=' + str(scores) + ' | mean=' + str(mscores))
+        #         if mscores > best_auc:
+        #             best_auc = mscores
 
         print ('done; best_auc=' + str(best_auc))
 
@@ -316,11 +355,8 @@ def train(in_dir, model_file, nets):
         # quick classifier
         # dft = dfj[dfj['0-1'] != 1]
         dft = dfj[dfj['i'] != dfj['j']]
-        # X = dft[['d1-0','d1-1','d2-0','d3-0']]
-        # X = dft[['d1-0','d1-1','d1-2','d1-3']]
-        # X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
-        X = dft[['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']]
-        # X = dft[['1-0','1-1','d1-0','d1-1','1-B','2-0','d2-0','2-B','3-0','d3-0','3-B','dist']]
+
+        X = dft[_cols]
 
         # scaled = scaler.fit_transform(X)
         # X = pd.DataFrame(scaled, columns=X.columns)
@@ -332,7 +368,8 @@ def train(in_dir, model_file, nets):
 
         print(k + ': fitting model')
         # per xval on all features: C=1, p=l1, w=8
-        clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
+        # clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
+        clf = GradientBoostingClassifier(n_estimators=200, max_features=.5, verbose=True)
         # clf = SVC(C=1, kernel='poly')
         clf.fit(X,y)
         s = pickle.dumps(clf)
@@ -357,8 +394,8 @@ def train(in_dir, model_file, nets):
         print (k + ' roc auc 2: ' + str(sl.metrics.auc(fpr, tpr)))
         # score to beat: 0.913357595165
 
-        scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
-        print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
+        # scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
+        # print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
         return scaler
 
 def predict(in_dir, model_file, nets, scaler=None):
@@ -375,9 +412,7 @@ def predict(in_dir, model_file, nets, scaler=None):
         # read tables
         dft = pd.read_table(out_dir + '/' + v[0] + '.test.csv', sep=',', index_col=[0,1])
 
-        # X = dft[['d1-0','d1-1','d1-2','d1-3','dist']]
-        # X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
-        X = dft[['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']]
+        X = dft[_cols]
 
         # scaled = scaler.transform(X)
         # X = pd.DataFrame(scaled, columns=X.columns)
@@ -405,11 +440,11 @@ def predict(in_dir, model_file, nets, scaler=None):
 
 # prepare(in_dir, prep_nets)
 
-evaluate(in_dir, train_nets)
+# evaluate(in_dir, train_nets)
 
-# scaler = train(in_dir, model_file, train_nets)
-#
-# predict(in_dir, model_file, test_nets, scaler)
+scaler = train(in_dir, model_file, train_nets)
+
+predict(in_dir, model_file, test_nets, scaler)
 
 
 # still to try:
