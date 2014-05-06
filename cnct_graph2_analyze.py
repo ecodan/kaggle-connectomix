@@ -30,8 +30,10 @@ import pickle
 import os
 import time
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.decomposition import PCA
+import scipy.stats as st
 
-# prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
+prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
 # prep_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC02inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC02inh.txt','networkPositions_iNet1_Size100_CC02inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC03inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC03inh.txt','networkPositions_iNet1_Size100_CC03inh.txt']),
@@ -39,7 +41,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 #              ('small',['fluorescence_iNet1_Size100_CC05inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC05inh.txt','networkPositions_iNet1_Size100_CC05inh.txt']),
 #              ('small',['fluorescence_iNet1_Size100_CC06inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC06inh.txt','networkPositions_iNet1_Size100_CC06inh.txt'])]
 # test_nets = [('small',['fluorescence_iNet1_Size100_CC01inh.txt.desc.csv-graph2.graphml','network_iNet1_Size100_CC01inh.txt','networkPositions_iNet1_Size100_CC01inh.txt'])]
-# train_nets = prep_nets
+train_nets = prep_nets
 
 # prep_nets = [
     #     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
@@ -61,29 +63,30 @@ from sklearn.ensemble import GradientBoostingClassifier
 #     ('test', ['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
 # ]
 
-train_nets = [
-    ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
-    ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
-#     ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph2.graphml','network_normal-3.txt','networkPositions_normal-3.txt']),
-#     ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph2.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt']),
-    ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
-#     ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph2.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt']),
-#     ('highcc',['fluorescence_highcc.txt.desc.csv-graph2.graphml','network_highcc.txt','networkPositions_highcc.txt']),
-#     ('highcon',['fluorescence_highcon.txt.desc.csv-graph2.graphml','network_highcon.txt','networkPositions_highcon.txt']),
-#     ('lowcc',['fluorescence_lowcc.txt.desc.csv-graph2.graphml','network_lowcc.txt','networkPositions_lowcc.txt']),
-#     ('lowcon',['fluorescence_lowcon.txt.desc.csv-graph2.graphml','network_lowcon.txt','networkPositions_lowcon.txt']),
-]
-
-test_nets = [
-    ('valid',['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
-    ('test',['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
-]
+# train_nets = [
+#     ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph2.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
+#     # ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph2.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
+# #     ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph2.graphml','network_normal-3.txt','networkPositions_normal-3.txt']),
+# #     ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph2.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt']),
+# #     ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph2.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
+# #     ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph2.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt']),
+# #     ('highcc',['fluorescence_highcc.txt.desc.csv-graph2.graphml','network_highcc.txt','networkPositions_highcc.txt']),
+# #     ('highcon',['fluorescence_highcon.txt.desc.csv-graph2.graphml','network_highcon.txt','networkPositions_highcon.txt']),
+# #     ('lowcc',['fluorescence_lowcc.txt.desc.csv-graph2.graphml','network_lowcc.txt','networkPositions_lowcc.txt']),
+# #     ('lowcon',['fluorescence_lowcon.txt.desc.csv-graph2.graphml','network_lowcon.txt','networkPositions_lowcon.txt']),
+# ]
+#
+# test_nets = [
+#     ('valid',['fluorescence_valid.txt.desc.csv-graph2.graphml','','networkPositions_valid.txt']),
+#     ('test',['fluorescence_test.txt.desc.csv-graph2.graphml','','networkPositions_test.txt'])
+# ]
 
 _cols = [
-    ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
+    # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15','d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
     # ['d0','d1','d2','d3','d4','d5','d6','d7','d8','d9','d10','d11','d12','d13','d14','d15'],
-    # ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15'],
-    # ['d1','d2','d4','d8']
+    ['e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','e10','e11','e12','e13','e14','e15'],
+    # ['d1','d2','d4','d8'],
+    # ['d1','d3','d5','d7','d9'],
 ]
 
 model_file = '/Users/dan/dev/datasci/kaggle/connectomix/out/model2.pkl'
@@ -120,7 +123,7 @@ def prepare(in_dir, nets):
         idx_tup = list(itertools.product(neurons, neurons))
 
         print(k + ': calculating neuron means and deltas...')
-        # calculate means and std of each neuron and their connections
+        # calculate means and std of firing events for each neuron and their connections
         start = time.time() * 1000
         n_ct = 0
         node_means = {}
@@ -229,7 +232,7 @@ def evaluate(in_dir, nets):
             # scaled = scaler.fit_transform(X)
             # X = pd.DataFrame(scaled, columns=X.columns)
 
-            # xval
+            # ref
             clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
             # clf = RandomForestClassifier(n_estimators=10, max_features=.5)
             scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
@@ -237,77 +240,82 @@ def evaluate(in_dir, nets):
             print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
             if mscores > best_auc:
                 best_auc = mscores
+            clf.fit(X,y)
+            z = clf.predict_proba(X)
+            probs = []
+            for r in z:
+                probs.append(r[1])
+            dft['pred'] = probs
 
-            # test on ref
-            # clf.fit(X, y)
-            # z = clf.predict_proba(X_ref)
-            # # this is probably a crappy way to do this
-            # probs = []
-            # for r in z:
-            #     probs.append(r[1])
-            # fpr, tpr, t = sl.metrics.roc_curve(y_ref, probs )
-            # auc = sl.metrics.auc(fpr, tpr)
-            # print (k + ' roc auc ref: ' + str(auc))
-            # if auc > best_auc:
-            #     best_auc = auc
+            # pca = PCA(n_components='mle')
+            # X = pca.fit_transform(X)
+
+            # calculate z-scores and probabilities (can do this more efficiently with scipy probably)
+            print(k + ': using std dev as features...')
+            for s in range(0,16):
+                mean = dft['e'+str(s)].mean()
+                std = dft['e'+str(s)].std()
+                # print(k+': diag c=' + str(s) + ' m=' + str(mean) + ' s=' + str(std))
+                dft['s'+str(s)] = dft['e' + str(s)].apply(lambda x: (x-mean)/std if std != 0 else 0)
+                dft['p'+str(s)] = dft['s' + str(s)].apply(lambda x: st.norm.cdf(x))
+
+            dft['prob'] = dft[['p1','p3','p5','p9']].apply(lambda x: np.mean(x), axis=1)
+            dft.to_csv(out_dir + '/temp.csv')
+            print('DIAG ' + str(dft.prob.shape))
+            fpr, tpr, t = sl.metrics.roc_curve(dft['act'], dft['p1'] )
+            auc = sl.metrics.auc(fpr, tpr)
+            print (k + ' roc auc 2: ' + str(auc))
+            if auc > best_auc:
+                best_auc = auc
+
+            # print(k + ': column list ' + str(dfs.columns))
+            # print(k + ': column list ' + str(dfs.columns[32::]))
+            # X = dfs[dfs.columns[32::]]
+            X = dft[['s1','s3','s5','s7','s9']]
+            y = dft['act']
+            clf = LogisticRegression(C=1,penalty='l2', class_weight={0:1,1:4})
+            scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+            mscores = np.mean(scores)
+            print(k + ': s xval scores=' + str(scores) + ' | mean=' + str(mscores))
+            if mscores > best_auc:
+                best_auc = mscores
 
 
-            # print('learning curve: ' + str(learning_curve(clf, X, y, range(500,30500,10000))))
-
-            # single classification
-            # X_train,X_test,y_train,y_test = train_test_split(X, y)
-            # print(k + ' y_train ' + str(len(y_train)) + '|' + str(np.sum(y_train)))
-            # print(k + ' y_test ' + str(len(y_test)) + '|' + str(np.sum(y_test)))
-            # clf.fit(X_train,y_train)
-            # z = clf.predict(X_test)
-            # print (k + ' conf matrix:\n' + str(sl.metrics.confusion_matrix(y_test,z)))
-            # z = clf.predict_proba(X_test)
-            # # this is probably a crappy way to do this
-            # probs = []
-            # for r in z:
-            #     probs.append(r[1])
-            # fpr, tpr, t = sl.metrics.roc_curve(y_test, probs )
-            # auc = sl.metrics.auc(fpr, tpr)
-            # print (k + ' roc auc 2: ' + str(auc))
-            # if auc > best_auc:
-            #     best_auc = auc
-
-
-            # logistic regression
-            # for C in [.01,.1,1,10]:
+            # # logistic regression
+            # for C in [.1,1,10]:
             #     for p in ['l1','l2']:
-            #         for w in [1,2,4,8]:
+            #         for w in [2,4,8]:
             #             print (k + ': evaluating C=' + str(C) + ' p=' + p + ' w=' + str(w))
             #             clf = LogisticRegression(C=C,penalty=p, class_weight={0:1,1:w})
             #             scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
             #             mscores = np.mean(scores)
-            #             print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
+            #             print(k + ': LR xval scores=' + str(scores) + ' | mean=' + str(mscores))
             #             if mscores > best_auc:
             #                 best_auc = mscores
-
-
-            # random forest
-            # for e in [5,10,15,25]:
+            #
+            #
+            # # random forest - not working so well on this
+            # for e in [5,10,25]:
             #     for c in ['gini','entropy']:
-            #         for f in [.25,.5,.75,1.0]:
+            #         for f in [.5,.75,1.0]:
             #             print (k + ': evaluating e=' + str(e) + ' c=' + c + ' f=' + str(f))
             #             clf = RandomForestClassifier(n_estimators=e,criterion=c, max_features=f)
             #             scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
             #             mscores = np.mean(scores)
-            #             print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
+            #             print(k + ': RF xval scores=' + str(scores) + ' | mean=' + str(mscores))
             #             if mscores > best_auc:
             #                 best_auc = mscores
 
             # gradient boost
-            for e in [50,100,200]:
-                    for f in [.5,.75,1.0]:
-                        print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
-                        clf = GradientBoostingClassifier(n_estimators=e, max_features=f, verbose=True)
-                        scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
-                        mscores = np.mean(scores)
-                        print(k + ': GB xval scores=' + str(scores) + ' | mean=' + str(mscores))
-                        if mscores > best_auc:
-                            best_auc = mscores
+            # for e in [50,100,200]:
+            #         for f in [.5,.75,1.0]:
+            #             print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+            #             clf = GradientBoostingClassifier(n_estimators=e, max_features=f, verbose=True)
+            #             scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+            #             mscores = np.mean(scores)
+            #             print(k + ': GB xval scores=' + str(scores) + ' | mean=' + str(mscores))
+            #             if mscores > best_auc:
+            #                 best_auc = mscores
 
 
         print ('done; best_auc=' + str(best_auc))
@@ -432,22 +440,11 @@ def predict(in_dir, model_file, nets, scaler=None):
     df.to_csv(in_dir + '/out/predictions2.csv', index=False)
     print('done; num rows=' + str(len(df)))
 
-# prepare(in_dir, prep_nets)
+prepare(in_dir, prep_nets)
 
-# evaluate(in_dir, train_nets)
+evaluate(in_dir, train_nets)
 
 scaler = train(in_dir, train_nets)
 
 predict(in_dir, model_file, test_nets, scaler)
 
-
-# still to try:
-# - neural net
-# -- increase hidden layers
-# -- increase epochs
-# x KNN - default config got .732
-# x adjusting features
-# - different graph model treatment of burst periods
-# - ensemble between correlation and graph approach
-# x create 8x8 pre-active probability matrix on each connection
-# - remove directionality

@@ -25,6 +25,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import roc_auc_score
+from sklearn.decomposition import ProbabilisticPCA
 import sklearn.preprocessing as pre
 import pickle
 import os
@@ -32,7 +33,6 @@ from datetime import datetime
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import ExtraTreesClassifier
-
 import pybrain as pb
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.datasets import SupervisedDataSet
@@ -58,16 +58,25 @@ from pybrain.structure import TanhLayer
 #     ('test', ['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
 # ]
 train_nets = [
-    ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph.graphml','network_normal-1.txt','networkPositions_normal-1.txt'])
+    ('normal-1',['fluorescence_normal-1.txt.desc.csv-graph.graphml','network_normal-1.txt','networkPositions_normal-1.txt']),
+    # ('normal-2',['fluorescence_normal-2.txt.desc.csv-graph.graphml','network_normal-2.txt','networkPositions_normal-2.txt']),
+    # ('normal-3',['fluorescence_normal-3.txt.desc.csv-graph.graphml','network_normal-3.txt','networkPositions_normal-3.txt']),
+    # ('normal-3-highrate',['fluorescence_normal-3-highrate.txt.desc.csv-graph.graphml','network_normal-3-highrate.txt','networkPositions_normal-3-highrate.txt']),
+    # ('normal-4',['fluorescence_normal-4.txt.desc.csv-graph.graphml','network_normal-4.txt','networkPositions_normal-4.txt']),
+    # ('normal-4-lownoise',['fluorescence_normal-4-lownoise.txt.desc.csv-graph.graphml','network_normal-4-lownoise.txt','networkPositions_normal-4-lownoise.txt']),
+    #     ('highcc',['fluorescence_highcc.txt.desc.csv-graph.graphml','network_highcc.txt','networkPositions_highcc.txt']),
+    #     ('highcon',['fluorescence_highcon.txt.desc.csv-graph.graphml','network_highcon.txt','networkPositions_highcon.txt']),
+    #     ('lowcc',['fluorescence_lowcc.txt.desc.csv-graph.graphml','network_lowcc.txt','networkPositions_lowcc.txt']),
+    #     ('lowcon',['fluorescence_lowcon.txt.desc.csv-graph.graphml','network_lowcon.txt','networkPositions_lowcon.txt']),
 ]
 test_nets = [
     ('valid',['fluorescence_valid.txt.desc.csv-graph.graphml','','networkPositions_valid.txt']),
     ('test',['fluorescence_test.txt.desc.csv-graph.graphml','','networkPositions_test.txt'])
 ]
 
-# _cols = ['d1-0','d1-1','d2-0','d3-0']
+_cols = ['d1-0','d1-1','d2-0','d3-0']
 # _cols = ['d1-0','d1-1','d1-2','d1-3']
-_cols = ['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']
+# _cols = ['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']
 # _cols = ['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']
 # _cols = ['1-0','1-1','d1-0','d1-1','1-B','2-0','d2-0','2-B','3-0','d3-0','3-B','dist']
 
@@ -213,18 +222,22 @@ def evaluate(in_dir, nets):
         # X = dft[['d1-0']]
         # X = dft[['d1-0','d1-1','d1-2','d1-3','dist']]
         # X = dft[['1-0','1-1','1-2','1-3','d1-0','d1-1','d1-2','d1-3','1-B','2-0','2-1','2-2','2-3','d2-0','d2-1','d2-2','d2-3','2-B','3-0','3-1','3-2','3-3','d3-0','d3-1','d3-2','d3-3','3-B','dist']]
-        X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
+        # X = dft[['d1-0','d1-1','d1-2','d1-3','d2-0','d2-1','d2-2','d2-3','d3-0','d3-1','d3-2','d3-3','dist']]
         # X = dft[['d1-0','d1-1','d1-2','d1-3']]
+        X = dft[['1-0','1-1','d1-0','d1-1']]
         y = dft['act']
 
-        # xval
-        clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:2})
+        # ref score
+        clf = LogisticRegression(C=1,penalty='l2', class_weight={0:1,1:4})
         # clf = RandomForestClassifier(n_estimators=10, max_features=.5)
         scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
         mscores = np.mean(scores)
-        print(k + ': xval scores=' + str(scores) + ' | mean=' + str(mscores))
+        print(k + ': ref xval scores=' + str(scores) + ' | mean=' + str(mscores))
         if mscores > best_auc:
             best_auc = mscores
+
+        # pca = ProbabilisticPCA(n_components='mle')
+        # X = pca.fit_transform(X)
 
         # print('learning curve: ' + str(learning_curve(clf, X, y, range(500,30500,10000))))
 
@@ -289,16 +302,16 @@ def evaluate(in_dir, nets):
         # fpr, tpr, t = sl.metrics.roc_curve(y_test, z )
         # print (k + ': roc auc: ' + str(sl.metrics.auc(fpr, tpr)))
 
-        # for e in [50,100,200]:
-        #     for f in [.5,.75,1.0]:
-        #         print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
-        #         clf = GradientBoostingClassifier(n_estimators=e, max_features=f, verbose=True)
-        #         scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
-        #         mscores = np.mean(scores)
-        #         print(k + ': GB xval scores=' + str(scores) + ' | mean=' + str(mscores))
-        #         if mscores > best_auc:
-        #             best_auc = mscores
-
+        for e in [50,100,200]:
+            for f in [.5,.75,1.0]:
+                print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+                clf = GradientBoostingClassifier(n_estimators=e, max_features=f, verbose=True)
+                scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+                mscores = np.mean(scores)
+                print(k + ': GB xval scores=' + str(scores) + ' | mean=' + str(mscores))
+                if mscores > best_auc:
+                    best_auc = mscores
+        #
         # for e in [50,100,200]:
         #     for f in [.5,.75,1.0]:
         #         print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
@@ -308,26 +321,24 @@ def evaluate(in_dir, nets):
         #         print(k + ': AB xval scores=' + str(scores) + ' | mean=' + str(mscores))
         #         if mscores > best_auc:
         #             best_auc = mscores
-
-        # best score small .706 vs .722 LR
-        # for e in [50,100,200]:
-        #     for f in [.5,.75,1.0]:
-        #         print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
-        #         clf = ExtraTreesClassifier(n_estimators=e, max_features=f, n_jobs=2, verbose=True)
-        #         scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
-        #         mscores = np.mean(scores)
-        #         print(k + ': ET xval scores=' + str(scores) + ' | mean=' + str(mscores))
-        #         if mscores > best_auc:
-        #             best_auc = mscores
+        #
+        # # best score small .706 vs .722 LR
+        for e in [50,100,200]:
+            for f in [.5,.75,1.0]:
+                print (k + ': evaluating e=' + str(e) + ' f=' + str(f))
+                clf = ExtraTreesClassifier(n_estimators=e, max_features=f, n_jobs=2, verbose=True)
+                scores = sl.cross_validation.cross_val_score(clf, X, y, scoring='roc_auc')
+                mscores = np.mean(scores)
+                print(k + ': ET xval scores=' + str(scores) + ' | mean=' + str(mscores))
+                if mscores > best_auc:
+                    best_auc = mscores
 
         print ('done; best_auc=' + str(best_auc))
 
 def train(in_dir, model_file, nets):
     print('train...')
 
-    if len(nets) > 1:
-        print('ERROR can only support one training net since only one model file supported')
-        return
+    dft = []
 
     for t in nets:
         k = t[0]
@@ -350,53 +361,63 @@ def train(in_dir, model_file, nets):
         dfj = dfc.join(actuals)
         dfj['act'] = dfj['act'].apply(lambda x: 1 if x == 1 else 0)
 
-        scaler = pre.StandardScaler()
+        if len(dft) == 0:
+            dft = dfj
+        else:
+            dft = dft.append(dfj)
 
-        # quick classifier
-        # dft = dfj[dfj['0-1'] != 1]
-        dft = dfj[dfj['i'] != dfj['j']]
+    scaler = pre.StandardScaler()
 
-        X = dft[_cols]
+    # quick classifier
+    # dft = dfj[dfj['0-1'] != 1]
+    dft = dfj[dfj['i'] != dfj['j']]
 
-        # scaled = scaler.fit_transform(X)
-        # X = pd.DataFrame(scaled, columns=X.columns)
+    X = dft[_cols]
 
-        y = dft['act']
-        X_train,X_test,y_train,y_test = train_test_split(X, y)
-        print(k + ' y_train ' + str(len(y_train)) + '|' + str(np.sum(y_train)))
-        print(k + ' y_test ' + str(len(y_test)) + '|' + str(np.sum(y_test)))
+    # scaled = scaler.fit_transform(X)
+    # X = pd.DataFrame(scaled, columns=X.columns)
 
-        print(k + ': fitting model')
-        # per xval on all features: C=1, p=l1, w=8
-        # clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
-        clf = GradientBoostingClassifier(n_estimators=200, max_features=.5, verbose=True)
-        # clf = SVC(C=1, kernel='poly')
-        clf.fit(X,y)
-        s = pickle.dumps(clf)
-        f = open(model_file, 'w')
-        f.write(s)
-        f.close()
+    y = dft['act']
+    X_train,X_test,y_train,y_test = train_test_split(X, y)
+    print(k + ' y_train ' + str(len(y_train)) + '|' + str(np.sum(y_train)))
+    print(k + ' y_test ' + str(len(y_test)) + '|' + str(np.sum(y_test)))
 
-        f = open(model_file, 'r')
-        s2 = f.read()
-        clf2 = pickle.loads(s2)
-        z = clf2.predict(X_test)
-        # print (k + ' roc auc: ' + str(roc_auc_score(y_test,z)))
-        print (k + ' conf matrix:\n' + str(sl.metrics.confusion_matrix(y_test,z)))
-        # print (k + ' class report:\n' + str(sl.metrics.classification_report(y_test,z)))
-        z = clf2.predict_proba(X_test)
+    print(k + ': fitting model')
+    ''' Best so far - clf = GradientBoostingClassifier(n_estimators=200, verbose=True)
+    normal-1 conf matrix:
+    [[246548    246]
+    [  2506    450]]
+    normal-1 roc auc 2: 0.917382608619
+    '''
+    clf = GradientBoostingClassifier(n_estimators=200, verbose=True)
+    # clf = LogisticRegression(C=1,penalty='l1', class_weight={0:1,1:8})
+    # clf = SVC(C=1, kernel='poly')
+    clf.fit(X,y)
+    s = pickle.dumps(clf)
+    f = open(model_file, 'w')
+    f.write(s)
+    f.close()
 
-        # this is probably a crappy way to do this
-        probs = []
-        for r in z:
-            probs.append(r[1])
-        fpr, tpr, t = sl.metrics.roc_curve(y_test, probs )
-        print (k + ' roc auc 2: ' + str(sl.metrics.auc(fpr, tpr)))
-        # score to beat: 0.913357595165
+    f = open(model_file, 'r')
+    s2 = f.read()
+    clf2 = pickle.loads(s2)
+    z = clf2.predict(X_test)
+    # print (k + ' roc auc: ' + str(roc_auc_score(y_test,z)))
+    print (k + ' conf matrix:\n' + str(sl.metrics.confusion_matrix(y_test,z)))
+    # print (k + ' class report:\n' + str(sl.metrics.classification_report(y_test,z)))
+    z = clf2.predict_proba(X_test)
 
-        # scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
-        # print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
-        return scaler
+    # this is probably a crappy way to do this
+    probs = []
+    for r in z:
+        probs.append(r[1])
+    fpr, tpr, t = sl.metrics.roc_curve(y_test, probs )
+    print (k + ' roc auc 2: ' + str(sl.metrics.auc(fpr, tpr)))
+    # score to beat: 0.913357595165
+
+    # scores = sl.cross_validation.cross_val_score(clf2, X, y, scoring='roc_auc')
+    # print(k + ': xval scores=' + str(scores) + ' | mean=' + str(np.mean(scores)))
+    return scaler
 
 def predict(in_dir, model_file, nets, scaler=None):
     print('predict...')
@@ -438,19 +459,11 @@ def predict(in_dir, model_file, nets, scaler=None):
     df.to_csv(in_dir + '/out/predictions.csv', index=False)
     print('done; num rows=' + str(len(df)))
 
-# prepare(in_dir, prep_nets)
+prepare(in_dir, prep_nets)
 
-# evaluate(in_dir, train_nets)
+evaluate(in_dir, train_nets)
 
 scaler = train(in_dir, model_file, train_nets)
 
 predict(in_dir, model_file, test_nets, scaler)
 
-
-# still to try:
-# - neural net
-# - KNN - default config got .732
-# - adjusting features
-# - different graph model treatment of burst periods
-# - ensemble between correlation and graph approach
-# - create 8x8 pre-active probability matrix on each connection
